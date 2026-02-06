@@ -46,11 +46,11 @@ locals {
 
   # pset_name is the attribute name for each permission set map/object
   # pset_index is the corresponding index of the map of maps (which is the variable permission_sets)
-  aws_managed_permission_sets                           = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if can(pset_index.aws_managed_policies) }
-  customer_managed_permission_sets                      = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if can(pset_index.customer_managed_policies) }
+  aws_managed_permission_sets                           = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if contains(keys(pset_index), "aws_managed_policies") && pset_index.aws_managed_policies != null }
+  customer_managed_permission_sets                      = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if contains(keys(pset_index), "customer_managed_policies") && pset_index.customer_managed_policies != null }
   inline_policy_permission_sets                         = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if contains(keys(pset_index), "inline_policy") }
-  permissions_boundary_aws_managed_permission_sets      = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if can(pset_index.permissions_boundary.managed_policy_arn) }
-  permissions_boundary_customer_managed_permission_sets = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if can(pset_index.permissions_boundary.customer_managed_policy_reference) }
+  permissions_boundary_aws_managed_permission_sets      = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if contains(try(keys(pset_index.permissions_boundary), []), "managed_policy_arn") }
+  permissions_boundary_customer_managed_permission_sets = { for pset_name, pset_index in var.permission_sets : pset_name => pset_index if contains(try(keys(pset_index.permissions_boundary), []), "customer_managed_policy_reference") }
 
 
 
@@ -69,7 +69,7 @@ locals {
       for policy in pset_index.aws_managed_policies : {
         pset_name  = pset_name
         policy_arn = policy
-      } if pset_index.aws_managed_policies != null && can(pset_index.aws_managed_policies)
+      }
     ]
   ])
 
@@ -80,7 +80,7 @@ locals {
         pset_name   = pset_name
         policy_name = policy
         # path = path
-      } if pset_index.customer_managed_policies != null && can(pset_index.customer_managed_policies)
+      }
     ]
   ])
 

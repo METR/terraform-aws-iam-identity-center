@@ -45,6 +45,19 @@ data "aws_iam_policy_document" "restrictAccessInlinePolicy" {
 #   }
 # }
 
+data "aws_iam_policy_document" "permissions_boundary" {
+  statement {
+    sid       = "AllowBoundary"
+    actions   = ["s3:ListAllMyBuckets"]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "permissions_boundary" {
+  name_prefix = "iam-idc-boundary-"
+  policy      = data.aws_iam_policy_document.permissions_boundary.json
+}
 
 module "aws-iam-identity-center" {
   source = "../.." // local example
@@ -104,7 +117,7 @@ module "aws-iam-identity-center" {
       managed_policy_arn   = "arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
 
       permissions_boundary = {
-        managed_policy_arn = "arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
+        managed_policy_arn = aws_iam_policy.permissions_boundary.arn
       }
       tags = { ManagedBy = "Terraform" }
     },
