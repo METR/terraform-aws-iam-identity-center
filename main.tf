@@ -199,7 +199,7 @@ resource "aws_ssoadmin_customer_managed_policy_attachment" "pset_customer_manage
 
 # - Inline Policy -
 resource "aws_ssoadmin_permission_set_inline_policy" "pset_inline_policy" {
-  for_each = { for pset in local.pset_inline_policy_maps : pset.pset_name => pset if can(pset.inline_policy) }
+  for_each = { for pset in local.pset_inline_policy_maps : pset.pset_name => pset }
 
   inline_policy      = each.value.inline_policy
   instance_arn       = local.ssoadmin_instance_arn
