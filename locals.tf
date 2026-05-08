@@ -36,7 +36,7 @@ locals {
 # - Permission Sets and Policies -
 locals {
   # - Fetch SSO Instance ARN and SSO Instance ID -
-  ssoadmin_instance_arn = tolist(data.aws_ssoadmin_instances.sso_instance.arns)[0]
+  ssoadmin_instance_arn = coalesce(var.sso_instance_arn, tolist(data.aws_ssoadmin_instances.sso_instance.arns)[0])
   sso_instance_id       = tolist(data.aws_ssoadmin_instances.sso_instance.identity_store_ids)[0]
 
   # Iterate over the objects in var.permission sets, then evaluate the expression's 'pset_name'

@@ -1,3 +1,9 @@
+variable "sso_instance_arn" {
+  type        = string
+  description = "SSO instance ARN. When provided, skips the data source lookup, preventing forced replacements of permission sets caused by computed values."
+  default     = null
+}
+
 # Groups
 variable "sso_groups" {
   description = "Names of the groups you wish to create in IAM Identity Center."
